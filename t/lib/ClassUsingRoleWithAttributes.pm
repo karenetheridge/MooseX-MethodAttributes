@@ -6,7 +6,10 @@ use Moose;
 
 use namespace::clean -except => 'meta';
 
-with 'RoleWithAttributes';
+with qw/
+    RoleWithAttributes
+    Other::Role
+/;
 
 __PACKAGE__->meta->make_immutable;
 

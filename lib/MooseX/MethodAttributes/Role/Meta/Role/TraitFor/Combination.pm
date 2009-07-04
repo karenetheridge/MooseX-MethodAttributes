@@ -3,10 +3,12 @@ use Moose::Role;
 use Moose::Util qw/find_meta/;
 use namespace::clean -except => [qw/ meta /];
 
+with 'MooseX::MethodAttributes::MetaclassMangler';
+
 around 'apply' => sub {
     my ($orig, $self, $thing, %opts) = @_;
 
-    $self->MooseX::MethodAttributes::Role::Meta::Role::_apply_metaclasses_to_target($thing);
+    $self->_mangle_metaclasses_for_target($thing);
 
     my $meta = find_meta($thing->name);
 

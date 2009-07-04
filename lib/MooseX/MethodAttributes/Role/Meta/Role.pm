@@ -59,10 +59,8 @@ around method_metaclass => sub {
     )->name();
 };
 
-around 'apply' => sub {
-    my ($orig, $self, $thing, %opts) = @_;
-    die("MooseX::MethodAttributes does not currently support method exclusion or aliasing.")
-        if ($opts{alias} or $opts{exclude});
+sub _apply_metaclasses_to_target {
+    my ($self, $thing) = @_;
     if ($thing->isa('Moose::Meta::Class')) {
         unless (
            does_role($thing, 'MooseX::MethodAttributes::Role::Meta::Class')
@@ -93,6 +91,14 @@ around 'apply' => sub {
     else {
         croak("Composing " . __PACKAGE__ . " onto instances is unsupported");
     }
+}
+
+around 'apply' => sub {
+    my ($orig, $self, $thing, %opts) = @_;
+    die("MooseX::MethodAttributes does not currently support method exclusion or aliasing.")
+        if ($opts{alias} or $opts{exclude});
+
+    $self->_apply_metaclasses_to_target($thing);
 
     # Note that the metaclass instance we started out with may have been turned
     # into lies by the role application process, so we explicitly re-fetch it
@@ -111,9 +117,16 @@ around 'apply' => sub {
 around _application_hook => sub {
     my ($orig, $self) = (shift, shift);
     my $to_apply = $self->$orig(@_);
-    if ($to_apply->isa('Moose::Meta::Role::Composite')) {
-        MooseX::MethodAttributes::Role::Meta::Role::TraitFor::Combination->meta->apply($to_apply);
-    }
+    my $new_class = Moose::Meta::Class->create_anon_class(
+        superclasses => [ ref($to_apply) ],
+        roles        => [qw/
+            MooseX::MethodAttributes::Role::Meta::Role::TraitFor::Combination
+        /],
+        cache        => 1,
+    )->name();
+    bless $to_apply, $new_class; # FIXME - This is disgusting, I should apply
+                                 #         a role to the instance, but that
+                                 #         fails somehow..
     return $to_apply;
 };
 

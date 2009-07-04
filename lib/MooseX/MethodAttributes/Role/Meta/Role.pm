@@ -106,13 +106,19 @@ around 'apply' => sub {
     my $meta = find_meta($thing->name);
 
     my $ret = $self->$orig($meta);
-    
+
     push @{ $meta->_method_attribute_list }, @{ $self->_method_attribute_list };
     @{ $meta->_method_attribute_map }{ (keys(%{ $self->_method_attribute_map }), keys(%{ $meta->_method_attribute_map })) }
         = (values(%{ $self->_method_attribute_map }), values(%{ $meta->_method_attribute_map }));
 
     return $ret;
 };
+
+# FIXME - We provide a blank method here in case we're using an old version of
+#         Moose which doesn't provide this method to wrap. If this method is
+#         provided by the class we're applied to, then this method is excluded
+#         and just the modifier is applied.
+sub _application_hook {}
 
 around _application_hook => sub {
     my ($orig, $self) = (shift, shift);

@@ -3,6 +3,7 @@ package MooseX::MethodAttributes::Role::Meta::Role;
 
 use Moose::Util::MetaRole;
 use Moose::Util qw/find_meta does_role ensure_all_roles/;
+use MooseX::MethodAttributes::Role::Meta::Role::TraitFor::Combination;
 use Carp qw/croak/;
 
 use Moose::Role;
@@ -105,6 +106,15 @@ around 'apply' => sub {
         = (values(%{ $self->_method_attribute_map }), values(%{ $meta->_method_attribute_map }));
 
     return $ret;
+};
+
+around _application_hook => sub {
+    my ($orig, $self) = (shift, shift);
+    my $to_apply = $self->$orig(@_);
+    if ($to_apply->isa('Moose::Meta::Role::Composite')) {
+        MooseX::MethodAttributes::Role::Meta::Role::TraitFor::Combination->meta->apply($to_apply);
+    }
+    return $to_apply;
 };
 
 package # Hide from PAUSE

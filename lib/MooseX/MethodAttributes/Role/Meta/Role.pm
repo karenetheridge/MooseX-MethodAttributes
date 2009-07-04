@@ -118,7 +118,7 @@ around 'apply' => sub {
 #         Moose which doesn't provide this method to wrap. If this method is
 #         provided by the class we're applied to, then this method is excluded
 #         and just the modifier is applied.
-sub _application_hook {}
+sub _application_hook { $_[1] }
 
 around _application_hook => sub {
     my ($orig, $self) = (shift, shift);

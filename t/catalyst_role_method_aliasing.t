@@ -30,19 +30,4 @@ use warnings;
 
     sub not_attributed {}
 }
-__END__
-use Test::More tests => 4;
-
-my $meta = roles::Controller::Foo->meta;
-my %expected = (
-    foo => ["Local"],
-    not_attributed => [],
-);
-foreach my $method_name (keys %expected) {
-    my $method = $meta->get_method($method_name);
-    ok $method, "Have method $method_name";
-    my $attrs = $meta->get_method_attributes($method->body);
-    is_deeply $attrs, $expected{$method_name},
-        "Attributes on $method_name as expected";
-}
 

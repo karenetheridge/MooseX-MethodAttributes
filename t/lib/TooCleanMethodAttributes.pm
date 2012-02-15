@@ -5,8 +5,6 @@ use Moose ();
 use Moose::Exporter;
 use Moose::Util::MetaRole;
 use Moose::Util qw/find_meta does_role/;
-# Ensure trait is registered
-use MooseX::MethodAttributes::Role::Meta::Role ();
 
 Moose::Exporter->setup_import_methods(
     also => 'Moose',
@@ -20,7 +18,7 @@ sub init_meta {
 
     Moose::Util::MetaRole::apply_base_class_roles(
         for_class => $for_class,
-        roles     => ['MooseX::MethodAttributes::Role::AttrContainer'],
+        roles     => ['TooCleanAttrContainer'],
     );
 
     return $meta;

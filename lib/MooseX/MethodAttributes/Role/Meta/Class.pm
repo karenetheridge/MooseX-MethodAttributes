@@ -86,7 +86,7 @@ For example, given:
 
 C<< SubClass->meta->get_all_methods_with_attributes >> will return
 C<< BaseClass->meta->get_method('foo') >> for the above example, but
-this method will not, and will return the wrapped bar method, wheras
+this method will not, and will return the wrapped bar method, whereas
 C<< get_all_methods_with_attributes >> will return the original method.
 
 =cut
